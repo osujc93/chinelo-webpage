@@ -1,0 +1,7 @@
+FROM ubuntu:22.04
+RUN apt update && apt install -y apache2 curl && apt clean && rm -rf /var/lib/apt/lists/*
+COPY SimpleWebPage.html /var/www/html/index.html
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+EXPOSE 80
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+HEALTHCHECK CMD curl --fail http://localhost:80/index.html || exit 1
