@@ -1,0 +1,24 @@
+# Start from Ubuntu 22.04 base image
+FROM ubuntu:22.04
+
+# Install necessary packages
+RUN apt update && apt install -y apache2 curl && apt clean && rm -rf /var/lib/apt/lists/*
+
+# Accept a build argument named ENV_COLOR
+ARG ENV_COLOR
+
+# Use a conditional to copy the correct file based on ENV_COLOR
+# Assuming the files are named simplewebpage-blue.html and simplewebpage-green.html
+COPY simplewebpage-${ENV_COLOR}.html /var/www/html/index.html
+
+# Add ServerName to Apache configuration
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Command to start Apache in the foreground
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+
+# Healthcheck to ensure the server is running
+HEALTHCHECK CMD curl --fail http://localhost:80/index.html || exit 1
